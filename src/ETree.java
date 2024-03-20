@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 public class ETree {
@@ -8,7 +7,7 @@ public class ETree {
 
     public ETree (TreeNode r) {
         root = r;
-        size = 1;
+        size++;
     }
     public ETree () {
         this(new TreeNode());
@@ -21,23 +20,22 @@ public class ETree {
         return root;
     }
 
-    public void buildTree() throws IOException {
+    public TreeNode buildTree() throws IOException {
         //Scanner sn = new Scanner(System.in);
         //System.out.print("Enter filename: ");
         //String file = sn.nextLine();
         //File ifile = new File(file);
-        File ifile = new File("test.txt"); //Delete when done testing
-        Scanner read = new Scanner(ifile);
+        //Scanner read = new Scanner(ifile);
+        Scanner read = new Scanner(System.in);
+        System.out.print("Enter an equation with parenthesis: ");
 
-        String line;
+        String[] line = read.nextLine().split(" ");
 
         ETree bt = new ETree();
-        TreeNode current = bt.root;
+        TreeNode current = root;
 
-        while (read.hasNext()) {
-            line = read.next();
-            System.out.println("LINE: " + line);
-            String[] arr = line.split("[(]");
+        for (String s : line) {
+            String[] arr = s.split("[(]");
             for (int i = 0; i < arr.length; i++) {
                 switch (arr[i]) {
                     case "":
@@ -45,50 +43,65 @@ public class ETree {
                         if (current.leftIsEmpty()) {
                             current.setLeft(newest);
                             current = current.getLeft();
-                        }
-                        else if (current.rightIsEmpty()) {
+                        } else if (current.rightIsEmpty()) {
                             current.setRight(newest);
                             current = current.getRight();
                         }
                         break;
                     case "+", "-", "/", "*":
-                        TreeNode newest2 = new TreeNode();
-                        newest2.setValue(arr[i]);
-                        current.setParent(newest2);
+                        while (current.getParent().getValue() != null) {
+                            current = current.getParent();
+                        }
                         current = current.getParent();
+                        current.setValue(arr[i]);
                         break;
                     default:
                         String arr2[] = arr[i].split("[)]");
-                        TreeNode newest3 = new TreeNode();
+                        TreeNode newest2 = new TreeNode();
                         if (i > 0) {
                             if (current.leftIsEmpty()) {
-                                if (arr[i - 1].equals(" ")) {
-                                    newest3.setValue(arr[i]);
-                                    current.setLeft(newest3);
-                                    current = current.getLeft();
-                                } else {
-                                    current.setValue(arr[i]);
-                                }
+                                newest2.setValue(arr[i]);
+                                current.setLeft(newest2);
+                                current = current.getLeft();
+                            } else if (current.rightIsEmpty()) {
+                                newest2.setValue(arr[i]);
+                                current.setRight(newest2);
+                                current = current.getRight();
                             }
-                            else if (current.rightIsEmpty()) {
-                                if (arr[i - 1].equals(" ")) {
-                                    newest3.setValue(arr[i]);
-                                    current.setLeft(newest3);
-                                    current = current.getLeft();
-                                } else {
-                                    current.setValue(arr[i]);
-                                }
+                        } else {
+                            if (current.leftIsEmpty()) {
+                                newest2.setValue(String.valueOf(arr2[0]));
+                                current.setLeft(newest2);
+                            } else if (current.rightIsEmpty()) {
+                                newest2.setValue(String.valueOf(arr2[0]));
+                                current.setRight(newest2);
                             }
-                        }
-                        if (current.leftIsEmpty()) {
-                            newest3.setValue(String.valueOf(arr2[0]));
-                        }
-                        else if (current.rightIsEmpty()) {
-                            newest3.setValue(String.valueOf(arr2[0]));
                         }
                 }
             }
-            System.out.println();
         }
+        return getRoot();
+    }
+
+    public void preOrderTrav(TreeNode node) {
+        if (node == null)
+            return;
+        System.out.print(node.getValue() + ", ");
+        preOrderTrav(node.getLeft());
+        preOrderTrav(node.getRight());
+    }
+    public void inOrderTrav(TreeNode node) {
+        if (node == null)
+            return;
+        inOrderTrav(node.getLeft());
+        System.out.print(node.getValue() + ", ");
+        inOrderTrav(node.getRight());
+    }
+    public void postOrderTrav(TreeNode node) {
+        if (node == null)
+            return;
+        postOrderTrav(node.getLeft());
+        postOrderTrav(node.getRight());
+        System.out.print(node.getValue() + ", ");
     }
 }

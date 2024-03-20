@@ -14,7 +14,7 @@ public class TreeNode {
         this (e, null, null, null);
     }
     public TreeNode () {
-        this("0", null, null, null);
+        this(null, null, null, null);
     }
 
     public void setValue(String value) {
